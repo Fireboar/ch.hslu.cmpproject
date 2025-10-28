@@ -28,7 +28,7 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    internal fun clearAndCreateTasks(tasks: List<Task>) {
+    internal suspend fun clearAndCreateTasks(tasks: List<Task>) {
         dbQuery.transaction {
             dbQuery.removeAllTasks()
             tasks.forEach { task ->
@@ -42,7 +42,7 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
             }
         }
     }
-    internal fun insertTask(task: Task) {
+    internal suspend fun insertTask(task: Task) {
         dbQuery.insertTask(
             title = task.title,
             description = task.description,
@@ -52,11 +52,11 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    internal fun deleteTask(task: Task) {
+    internal suspend fun deleteTask(task: Task) {
         dbQuery.deleteTask(task.id.toLong())
     }
 
-    internal fun updateTask(task: Task) {
+    internal suspend fun updateTask(task: Task) {
         dbQuery.updateTask(
             id = task.id.toLong(),
             title = task.title,

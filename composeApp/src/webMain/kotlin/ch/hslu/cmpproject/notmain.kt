@@ -6,7 +6,7 @@ import ch.hslu.cmpproject.network.SpaceXApi
 import ch.hslu.cmpproject.viewmodel.TaskViewModel
 
 @OptIn(ExperimentalComposeUiApi::class)
-fun main() {
+fun mainWeb() {
     ComposeViewport {
         /*val api = SpaceXApi()
         val sdk = SpaceXSDK(
