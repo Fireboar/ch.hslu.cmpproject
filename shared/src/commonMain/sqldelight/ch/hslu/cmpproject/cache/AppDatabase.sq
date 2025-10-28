@@ -1,0 +1,28 @@
+import kotlin.Boolean;
+
+CREATE TABLE Tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    dueDate TEXT NOT NULL,
+    dueTime TEXT NOT NULL,
+    status TEXT DEFAULT 'To Do'
+);
+
+insertTask:
+INSERT INTO Tasks( title, description, dueDate, dueTime, status)
+VALUES( ?, ?, ?, ?, ?);
+
+removeAllTasks:
+DELETE FROM Tasks;
+
+selectAllTasksInfo:
+SELECT * FROM Tasks;
+
+deleteTask:
+DELETE FROM Tasks WHERE id = ?;
+
+updateTask:
+UPDATE Tasks
+SET title = ?, description = ?, dueDate = ?, dueTime = ?, status = ?
+WHERE id = ?;
