@@ -8,7 +8,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 actual suspend fun provideDbDriver(
     schema: SqlSchema<QueryResult.AsyncValue<Unit>>
 ): SqlDriver {
-    val driver = JdbcSqliteDriver("jdbc:sqlite:app_database.db") // persistente Datei
+    val driver = JdbcSqliteDriver("jdbc:sqlite:app_database.db")
     schema.create(driver).await()
     return driver
 }

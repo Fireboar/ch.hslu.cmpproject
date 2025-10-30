@@ -30,6 +30,9 @@ compose = "1.7.3"
 
 
 [libraries]
+#Test
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesVersion" }
+
 #Database
 runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
 sqlDelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqlDelight" }
