@@ -49,7 +49,6 @@ kotlin {
             implementation(libs.ktor.serialization.kotlinx.json)
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
-            implementation(libs.koin.core)
         }
         androidMain.dependencies {
             //Database

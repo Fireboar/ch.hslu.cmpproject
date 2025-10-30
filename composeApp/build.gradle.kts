@@ -42,17 +42,11 @@ kotlin {
 
     sourceSets {
         androidMain.dependencies {
-            //Database
-            implementation(libs.androidx.compose.material3)
-            implementation(libs.koin.androidx.compose)
-            //implementation(libs.androidx.lifecycle.viewmodel.compose)
-
             //Common
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
-
             //Icons
             implementation(libs.compose.material.icons.extended)
 
