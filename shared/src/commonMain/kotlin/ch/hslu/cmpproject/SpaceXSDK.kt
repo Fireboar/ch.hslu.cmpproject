@@ -1,13 +1,11 @@
 package ch.hslu.cmpproject
 
 import ch.hslu.cmpproject.cache.Database
-import ch.hslu.cmpproject.cache.DatabaseDriverFactory
 import ch.hslu.cmpproject.entity.Task
 import ch.hslu.cmpproject.network.SpaceXApi
 
 
-class SpaceXSDK(databaseDriverFactory: DatabaseDriverFactory, val api: SpaceXApi) {
-    private val database = Database(databaseDriverFactory)
+class SpaceXSDK(val database: Database, val api: SpaceXApi) {
 
     @Throws(Exception::class)
     suspend fun getTasks(forceReload: Boolean): List<Task> {

@@ -10,6 +10,11 @@ plugins {
     alias(libs.plugins.sqldelight)
 }
 
+repositories {
+    google()
+    mavenCentral()
+}
+
 kotlin {
     androidTarget {
         compilerOptions {
@@ -64,9 +69,10 @@ kotlin {
         jsMain.dependencies {
             //Database
             implementation(libs.web.worker.driver)
+            implementation(devNpm("copy-webpack-plugin", "9.1.0"))
+            //Database Worker
             implementation(npm("@cashapp/sqldelight-sqljs-worker", "2.1.0"))
             implementation(npm("sql.js", "1.8.0"))
-            implementation(devNpm("copy-webpack-plugin", "9.1.0"))
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -91,7 +97,7 @@ sqldelight {
     databases {
         create("AppDatabase") {
             packageName.set("ch.hslu.cmpproject.cache")
-            //generateAsync.set(true)
+            generateAsync.set(true)
         }
     }
 }

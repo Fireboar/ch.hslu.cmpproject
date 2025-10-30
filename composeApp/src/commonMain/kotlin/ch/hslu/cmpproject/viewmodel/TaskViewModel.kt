@@ -35,16 +35,18 @@ class TaskViewModel (private val sdk: SpaceXSDK) : ViewModel(){
         }
     }
 
-    fun addTask(title: String, description: String, dueDate: String, dueTime: String, status:String) {
-        val task = Task(
-            id = 0,
-            title = title,
-            description = description,
-            dueDate = dueDate,
-            dueTime = dueTime,
-            status = status
-        )
-        addTask(task)
+    fun addTask(title: String, description: String, dueDate: String, dueTime: String, status:String?) {
+        viewModelScope.launch {
+            val task = Task(
+                id = 0,
+                title = title,
+                description = description,
+                dueDate = dueDate,
+                dueTime = dueTime,
+                status = status ?: "To Do"
+            )
+            addTask(task)
+        }
     }
 
     fun addTask(task: Task) {

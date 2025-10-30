@@ -1,13 +1,16 @@
 package ch.hslu.cmpproject.cache
 
+import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.db.SqlDriver
 import ch.hslu.cmpproject.entity.Task
 
-internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
-    private val database = AppDatabase(databaseDriverFactory.createDriver())
-    private val dbQuery = database.appDatabaseQueries
+class Database (val driver: SqlDriver){
 
-    internal fun getAllTasks(): List<Task> {
-        return dbQuery.selectAllTasksInfo(::mapTaskSelecting).executeAsList()
+    private val database = AppDatabase(driver)
+    private val dbQuery get() = database.appDatabaseQueries
+
+    internal suspend fun getAllTasks(): List<Task> {
+        return dbQuery.selectAllTasksInfo(::mapTaskSelecting).awaitAsList()
     }
 
     internal fun mapTaskSelecting(
@@ -21,7 +24,7 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
         return Task(
             id = id.toInt(),
             title = title,
-            description = description?:"",
+            description = description ?: "",
             dueDate = dueDate,
             dueTime = dueTime,
             status = status ?: "To Do"
@@ -42,6 +45,7 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
             }
         }
     }
+
     internal suspend fun insertTask(task: Task) {
         dbQuery.insertTask(
             title = task.title,
@@ -66,6 +70,4 @@ internal class Database(databaseDriverFactory: DatabaseDriverFactory) {
             status = task.status
         )
     }
-
-
 }
