@@ -15,6 +15,3 @@ fun App(taskViewModel: TaskViewModel) {
     }
 
 }
-
-
-

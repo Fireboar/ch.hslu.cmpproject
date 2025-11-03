@@ -1,15 +1,6 @@
 package ch.hslu.cmpproject
 
-import ch.hslu.cmpproject.cache.AppDatabase
-import ch.hslu.cmpproject.cache.Database
-import ch.hslu.cmpproject.cache.provideDbDriver
-import ch.hslu.cmpproject.entity.Task
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlinx.coroutines.test.runTest
-
-class DatabasePersistenceTest {
-
+class DatabaseTests {
     @Test
     fun testTaskPersistence() = runTest {
         val driver = provideDbDriver(AppDatabase.Schema)

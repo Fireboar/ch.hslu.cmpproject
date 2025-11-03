@@ -11,11 +11,6 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_11)
-        }
-    }
 
     listOf(
         iosArm64(),
@@ -27,15 +22,15 @@ kotlin {
         }
     }
 
+    androidTarget {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
+
     jvm()
 
     js {
-        browser()
-        binaries.executable()
-    }
-
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
         browser()
         binaries.executable()
     }

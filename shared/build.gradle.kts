@@ -21,7 +21,7 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
     iosArm64()
     iosSimulatorArm64()
     
@@ -30,10 +30,23 @@ kotlin {
     js {
         browser()
     }
-    
-    @OptIn(ExperimentalWasmDsl::class)
-    wasmJs {
-        browser()
+
+    //Tests
+    js(IR) {
+        browser {
+            testTask {
+                useKarma {
+                    useChromeHeadless() // Headless Browser für Tests
+                }
+            }
+        }
+        nodejs {
+            testTask {
+                useMocha {
+                    timeout = "5000"
+                }
+            }
+        }
     }
     
     sourceSets {
