@@ -30,7 +30,7 @@ jobs:
         run: ./gradlew iosArm64ReleaseFramework
 
       - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: iOSApp
           path: build/bin/iosArm64/releaseFramework
