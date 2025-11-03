@@ -1,0 +1,36 @@
+name: iOS Build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
+
+      - name: Build iOS Framework
+        run: ./gradlew iosArm64Binaries iosSimulatorArm64Binaries
+
+      - name: Package IPA (optional)
+        run: ./gradlew iosArm64ReleaseFramework
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: iOSApp
+          path: build/bin/iosArm64/releaseFramework
