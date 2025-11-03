@@ -26,14 +26,15 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Build iOS Framework
-        run: ./gradlew iosArm64Binaries iosSimulatorArm64Binaries
+      - name: Build iOS Frameworks
+        run: |
+          ./gradlew iosArm64ReleaseFramework
+          ./gradlew iosSimulatorArm64ReleaseFramework
 
-      - name: Package IPA (optional)
-        run: ./gradlew iosArm64ReleaseFramework
-
-      - name: Upload IPA Artifact
+      - name: Upload iOS Frameworks
         uses: actions/upload-artifact@v4
         with:
-          name: iOSApp
-          path: build/bin/iosArm64/releaseFramework
+          name: iOSFrameworks
+          path: |
+            build/bin/iosArm64/releaseFramework
+            build/bin/iosSimulatorArm64/releaseFramework
