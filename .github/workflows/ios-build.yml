@@ -28,13 +28,13 @@ jobs:
 
       - name: Build iOS Frameworks
         run: |
-          ./gradlew iosArm64ReleaseFramework
-          ./gradlew iosSimulatorArm64ReleaseFramework
+          ./gradlew iosArm64Binaries
+          ./gradlew iosSimulatorArm64Binaries
 
       - name: Upload iOS Frameworks
         uses: actions/upload-artifact@v4
         with:
           name: iOSFrameworks
           path: |
-            build/bin/iosArm64/releaseFramework
-            build/bin/iosSimulatorArm64/releaseFramework
+            composeApp/build/bin/iosArm64
+            composeApp/build/bin/iosSimulatorArm64
