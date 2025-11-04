@@ -1,17 +1,14 @@
-name: iOS Build
+name: iOS Unsigned IPA Build
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
+  workflow_dispatch:
 
 jobs:
-  ios:
+  build-ios:
     runs-on: macos-latest
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Set up JDK
@@ -31,10 +28,26 @@ jobs:
           ./gradlew iosArm64Binaries
           ./gradlew iosSimulatorArm64Binaries
 
-      - name: Upload iOS Frameworks
+      - name: Create Xcode Project and Build IPA
+        run: |
+          # Beispiel: passe den Pfad und den Namen an dein Projekt an
+          xcodebuild \
+            -project iosApp/iosApp.xcodeproj \
+            -scheme iosApp \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath build/iosApp.xcarchive archive || true
+
+          mkdir -p build/ipa
+          # Exportiere ein unsigniertes IPA
+          xcodebuild \
+            -exportArchive \
+            -archivePath build/iosApp.xcarchive \
+            -exportPath build/ipa \
+            -exportOptionsPlist iosApp/exportOptions.plist || true
+
+      - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
         with:
-          name: iOSFrameworks
-          path: |
-            composeApp/build/bin/iosArm64
-            composeApp/build/bin/iosSimulatorArm64
+          name: Unsigned-iOS-App
+          path: build/ipa

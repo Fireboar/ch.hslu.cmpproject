@@ -27,29 +27,7 @@ class MainActivity : ComponentActivity() {
         ContextHolder.init(this)
 
         setContent {
-            var taskViewModel by remember { mutableStateOf<TaskViewModel?>(null) }
-
-            // Läuft beim Start — kann suspend-Funktionen aufrufen
-            LaunchedEffect(Unit) {
-                val driver = provideDbDriver(AppDatabase.Schema)
-                val database = Database(driver)
-                val api = SpaceXApi()
-                val sdk = SpaceXSDK(database, api)
-
-                taskViewModel = TaskViewModel(sdk)
-            }
-
-            taskViewModel?.let { tvm ->
-                App(tvm)
-            } ?: run {
-                // Optional: Ladeanzeige
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
+            AppRoot()
         }
 
     }
