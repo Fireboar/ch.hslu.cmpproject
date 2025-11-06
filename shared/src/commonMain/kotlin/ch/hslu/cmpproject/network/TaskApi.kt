@@ -29,20 +29,15 @@ class TaskApi() {
         return httpClient.get("http://192.168.1.22:8080/tasks").body()
     }
 
-    suspend fun addTask(task: Task): Task {
+    suspend fun addTask(task: Task):Boolean {
         return try {
             val response = httpClient.post("http://192.168.1.22:8080/tasks") {
                 contentType(ContentType.Application.Json)
                 setBody(task)
             }
-
-            if (response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK) {
-                response.body<Task>()
-            } else {
-                throw Exception("Server returned ${response.status} for task id=${task.id}")
-            }
+            response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK
         } catch (e: Exception) {
-            throw Exception("${e.message}")
+            false
         }
     }
 

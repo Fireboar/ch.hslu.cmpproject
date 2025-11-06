@@ -27,37 +27,46 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      # 5️⃣ iOS Frameworks bauen
+      # 5️⃣ iOS Frameworks bauen (für reale Geräte + Simulator)
       - name: Build iOS Frameworks
         run: |
           ./gradlew iosArm64Binaries
           ./gradlew iosSimulatorArm64Binaries
 
-      # 6️⃣ Xcode App archivieren
-      - name: Archive iOS App
+      # 6️⃣ iOS App archivieren (ohne Code Signing)
+      - name: Archive iOS App (Unsigned)
         run: |
           xcodebuild \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Release \
             -sdk iphoneos \
-            -archivePath build/iosApp.xcarchive archive
+            -archivePath build/iosApp.xcarchive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM="" \
+            archive
 
-      # 7️⃣ IPA exportieren (unsigned)
-      - name: Export IPA
+      # 7️⃣ IPA exportieren (ebenfalls ohne Signing)
+      - name: Export IPA (Unsigned)
         run: |
           mkdir -p build/ipa
           xcodebuild \
             -exportArchive \
             -archivePath build/iosApp.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist iosApp/exportOptions.plist
+            -exportOptionsPlist iosApp/exportOptions.plist \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM=""
 
       # 8️⃣ Inhalt prüfen
-      - name: Check IPA
+      - name: Check IPA contents
         run: ls -l build/ipa
 
-      # 9️⃣ IPA hochladen
+      # 9️⃣ IPA hochladen als Artifact
       - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
         with:

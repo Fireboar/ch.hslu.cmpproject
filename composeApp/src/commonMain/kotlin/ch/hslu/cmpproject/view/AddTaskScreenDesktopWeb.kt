@@ -26,11 +26,58 @@ fun AddTaskScreenDesktopWeb(taskViewModel: TaskViewModel, paddingValues: Padding
     val dateFocus = remember { FocusRequester() }
     val timeFocus = remember { FocusRequester() }
 
+    fun submitTask() {
+        if (title.isBlank()) {
+            error = "Titel darf nicht leer sein"
+            return
+        }
+
+        try {
+            val partsDate = date.split(".").map { it.toInt() }
+            val partsTime = time.split(":").map { it.toInt() }
+
+            LocalDateTime(
+                year = partsDate[2],
+                month = partsDate[1],
+                day = partsDate[0],
+                hour = partsTime[0],
+                minute = partsTime[1]
+            )
+
+            taskViewModel.addTask(
+                title = title,
+                description = description,
+                dueDate = date,
+                dueTime = time,
+                status = "To Do"
+            )
+
+            // Felder zurücksetzen
+            title = ""
+            description = ""
+            date = ""
+            time = ""
+            error = ""
+
+            titleFocus.requestFocus()
+
+        } catch (e: Exception) {
+            error = "Datum oder Uhrzeit ungültig"
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(paddingValues)
-            .padding(16.dp),
+            .padding(16.dp)
+            .onPreviewKeyEvent { event ->
+                if (event.type == KeyEventType.KeyDown && event.key == Key.Enter) {
+                    // Button-Klick simulieren
+                    submitTask()
+                    true
+                } else false
+            },
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
@@ -93,47 +140,11 @@ fun AddTaskScreenDesktopWeb(taskViewModel: TaskViewModel, paddingValues: Padding
         }
 
         Button(
-            onClick = {
-                if (title.isBlank()) {
-                    error = "Titel darf nicht leer sein"
-                    return@Button
-                }
-
-                try {
-                    val partsDate = date.split(".").map { it.toInt() }
-                    val partsTime = time.split(":").map { it.toInt() }
-
-                    LocalDateTime(
-                        year = partsDate[2],
-                        month = partsDate[1],
-                        day = partsDate[0],
-                        hour = partsTime[0],
-                        minute = partsTime[1]
-                    )
-
-                    taskViewModel.addTask(
-                        title = title,
-                        description = description,
-                        dueDate = date,
-                        dueTime = time,
-                        status = "To Do"
-                    )
-
-                    title = ""
-                    description = ""
-                    date = ""
-                    time = ""
-                    error = ""
-
-                    titleFocus.requestFocus() // Fokus zurück zum ersten Feld
-
-                } catch (e: Exception) {
-                    error = "Datum oder Uhrzeit ungültig"
-                }
-            },
+            onClick = { submitTask() },
             modifier = Modifier.align(Alignment.End)
         ) {
             Text("Aufgabe hinzufügen")
         }
+
     }
 }

@@ -14,7 +14,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 
-const val SERVER_PORT = 8080
+const val SERVER_PORT = 9090
 
 fun main() {
     embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
@@ -66,14 +66,16 @@ suspend fun Application.module() {
         post("/tasks") {
             val task = call.receive<Task>()
 
+            println("Server received task: id=${task.id}, title=${task.title}, description=${task.description}, dueDate=${task.dueDate}, dueTime=${task.dueTime}, status=${task.status}")
+
             // Insert oder Update
             queries.insertOrReplaceTask(
                 id = task.id.toLong(),
-                title = task.title,
-                description = task.description,
-                dueDate = task.dueDate,
-                dueTime = task.dueTime,
-                status = task.status
+                title = task.title.toString(),
+                description = task.description ?: "",
+                dueDate = task.dueDate.toString(),
+                dueTime = task.dueTime.toString(),
+                status = task.status ?: "To Do"
             )
 
             // Nur Erfolgsstatus zurückgeben

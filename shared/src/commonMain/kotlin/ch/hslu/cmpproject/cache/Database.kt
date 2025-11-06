@@ -69,10 +69,10 @@ class Database (val driver: SqlDriver){
             Task(
                 id = inserted.id.toInt(),
                 title = inserted.title,
-                description = inserted.description,
+                description = inserted.description ?: "",
                 dueDate = inserted.dueDate,
                 dueTime = inserted.dueTime,
-                status = inserted.status
+                status = inserted.status ?: "To Do"
             )
         }
     }

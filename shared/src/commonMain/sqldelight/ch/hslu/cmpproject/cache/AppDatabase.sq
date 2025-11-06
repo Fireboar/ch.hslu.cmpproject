@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS Tasks (
     description TEXT,
     dueDate TEXT NOT NULL,
     dueTime TEXT NOT NULL,
-    status TEXT DEFAULT 'To Do'
+    status TEXT
 );
 
 insertTask:
