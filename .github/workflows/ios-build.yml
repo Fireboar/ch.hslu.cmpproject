@@ -8,26 +8,32 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      # 1️⃣ Repository auschecken
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Java für Gradle einrichten
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+      # 3️⃣ CocoaPods installieren (für KMP iOS Frameworks)
       - name: Install CocoaPods
         run: sudo gem install cocoapods
 
+      # 4️⃣ Gradle ausführbar machen
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      # 5️⃣ iOS Frameworks bauen
       - name: Build iOS Frameworks
         run: |
           ./gradlew iosArm64Binaries
           ./gradlew iosSimulatorArm64Binaries
 
+      # 6️⃣ Xcode App archivieren
       - name: Archive iOS App
         run: |
           xcodebuild \
@@ -37,6 +43,7 @@ jobs:
             -sdk iphoneos \
             -archivePath build/iosApp.xcarchive archive
 
+      # 7️⃣ IPA exportieren (unsigned)
       - name: Export IPA
         run: |
           mkdir -p build/ipa
@@ -46,11 +53,13 @@ jobs:
             -exportPath build/ipa \
             -exportOptionsPlist iosApp/exportOptions.plist
 
+      # 8️⃣ Inhalt prüfen
       - name: Check IPA
         run: ls -l build/ipa
 
+      # 9️⃣ IPA hochladen
       - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: Unsigned-iOS-App
-          path: build/ipa/iosApp.ipa
+          path: build/ipa

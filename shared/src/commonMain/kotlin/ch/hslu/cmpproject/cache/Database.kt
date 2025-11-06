@@ -32,8 +32,8 @@ class Database (val driver: SqlDriver){
     }
 
     internal suspend fun replaceTasks(tasks: List<Task>) {
+        dbQuery.deleteAllTasks()
         dbQuery.transaction {
-            dbQuery.deleteAllTasks()
             tasks.forEach { task ->
                 dbQuery.insertOrReplaceTask(
                     id = task.id.toLong(),
@@ -48,26 +48,33 @@ class Database (val driver: SqlDriver){
     }
 
     internal suspend fun insertTask(task: Task): Task {
-        dbQuery.insertTask(
-            title = task.title,
-            description = task.description,
-            dueDate = task.dueDate,
-            dueTime = task.dueTime,
-            status = task.status
-        )
-        // Task aus der DB holen
-        val newId = dbQuery.lastInsertRowId().executeAsOne()
-        val inserted = dbQuery.selectTaskById(newId).executeAsOne()
+        return dbQuery.transactionWithResult {
+            // Insert
+            dbQuery.insertTask(
+                title = task.title,
+                description = task.description,
+                dueDate = task.dueDate,
+                dueTime = task.dueTime,
+                status = task.status
+            )
 
-        // In serialisierbares Task-Modell umwandeln
-        return Task(
-            id = inserted.id.toInt(),
-            title = inserted.title,
-            description = inserted.description,
-            dueDate = inserted.dueDate,
-            dueTime = inserted.dueTime,
-            status = inserted.status
-        )
+            // ID direkt nach Insert abrufen
+            val newId = dbQuery.lastInsertRowId().executeAsOne()
+
+            // Task anhand der ID holen
+            val inserted = dbQuery.selectTaskById(newId).executeAsOneOrNull()
+                ?: throw IllegalStateException("Task wurde nicht gefunden, ID=$newId")
+
+            // serialisierbares Task zurückgeben
+            Task(
+                id = inserted.id.toInt(),
+                title = inserted.title,
+                description = inserted.description,
+                dueDate = inserted.dueDate,
+                dueTime = inserted.dueTime,
+                status = inserted.status
+            )
+        }
     }
 
     internal suspend fun deleteTask(task: Task) {

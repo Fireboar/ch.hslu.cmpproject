@@ -23,13 +23,12 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
         viewModelScope.launch {
             _isLoading.value = true
             try {
+                loadTasks()
                 val inSync = sdk.isInSync()
                 if (!inSync) {
                     // Meldung anzeigen, z.B. Snackbar oder StateFlow
                     _syncMessage.value = "Lokale Daten und Server sind nicht synchron!"
                 }
-
-                loadTasks()
             } catch (e: Exception) {
                 e.printStackTrace()
             } finally {
@@ -121,11 +120,11 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
             _isLoading.value = true
             try {
                 sdk.addTask(task)
-                loadTasks()
                 _syncMessage.value = "Task '${task.title}' erfolgreich hinzugefügt und synchronisiert."
             } catch (e: Exception) {
                 _syncMessage.value = "Fehler beim Hinzufügen des Tasks '${task.title}': ${e.message}"
             } finally {
+                loadTasks()
                 _isLoading.value = false
             }
         }
@@ -136,13 +135,13 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
             _isLoading.value = true
             try {
                 sdk.deleteTask(task)
-                loadTasks()
                 _syncMessage.value = "Task '${task.title}' erfolgreich gelöscht und synchronisiert."
             } catch (e: Exception) {
                 e.printStackTrace()
-                _syncMessage.value = "Fehler beim Löschen der Task '${task.title}': ${e.message}"
+                _syncMessage.value = "Fehler beim Löschen des Tasks '${task.title}': ${e.message}"
             } finally {
                 _isLoading.value = false
+                loadTasks()
             }
         }
     }

@@ -79,6 +79,8 @@ class TaskSDK(val database: Database, val api: TaskApi) {
         //Lokal einfügen
         val newTask = database.insertTask(task)
 
+        println("Task lokal eingefügt: id=${newTask.id}, title=${newTask.title}, description=${newTask.description}, dueDate=${newTask.dueDate}, dueTime=${newTask.dueTime}, status=${newTask.status}")
+
         //Auf Server versuchen
         try {
             api.addTask(newTask)
@@ -102,9 +104,9 @@ class TaskSDK(val database: Database, val api: TaskApi) {
     }
 
     suspend fun deleteTask(task: Task) {
+        database.deleteTask(task)
         try {
             api.deleteTask(task.id.toLong()) // Server löschen
-            database.deleteTask(task)        // lokal löschen
         } catch (e: Exception) {
             database.deleteTask(task)        // lokal trotzdem löschen
             throw e

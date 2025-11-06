@@ -29,7 +29,7 @@ class TaskApi() {
         return httpClient.get("http://192.168.1.22:8080/tasks").body()
     }
 
-    suspend fun addTask(task: Task): Task? {
+    suspend fun addTask(task: Task): Task {
         return try {
             val response = httpClient.post("http://192.168.1.22:8080/tasks") {
                 contentType(ContentType.Application.Json)

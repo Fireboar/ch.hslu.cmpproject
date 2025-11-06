@@ -65,6 +65,8 @@ suspend fun Application.module() {
         // CREATE
         post("/tasks") {
             val task = call.receive<Task>()
+
+            // Insert oder Update
             queries.insertOrReplaceTask(
                 id = task.id.toLong(),
                 title = task.title,
@@ -74,28 +76,8 @@ suspend fun Application.module() {
                 status = task.status
             )
 
-            val id = queries.lastInsertRowId().executeAsOneOrNull()
-            if (id == null) {
-                call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Failed to create task"))
-                return@post
-            }
-
-            val created = queries.selectTaskById(id).executeAsOneOrNull()
-            if (created == null) {
-                call.respond(HttpStatusCode.InternalServerError, mapOf("message" to "Failed to retrieve task after insert"))
-                return@post
-            }
-
-            call.respond(
-                Task(
-                    id = created.id.toInt(),
-                    title = created.title,
-                    description = created.description,
-                    dueDate = created.dueDate,
-                    dueTime = created.dueTime,
-                    status = created.status
-                )
-            )
+            // Nur Erfolgsstatus zurückgeben
+            call.respond(HttpStatusCode.OK, mapOf("message" to "Task upserted successfully"))
         }
 
         // READ ALL
