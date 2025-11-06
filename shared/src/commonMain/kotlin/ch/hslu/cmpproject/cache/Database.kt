@@ -33,6 +33,7 @@ class Database (val driver: SqlDriver){
 
     internal suspend fun replaceTasks(tasks: List<Task>) {
         dbQuery.transaction {
+            dbQuery.deleteAllTasks()
             tasks.forEach { task ->
                 dbQuery.insertOrReplaceTask(
                     id = task.id.toLong(),

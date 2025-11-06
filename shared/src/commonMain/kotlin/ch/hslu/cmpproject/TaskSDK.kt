@@ -83,6 +83,7 @@ class TaskSDK(val database: Database, val api: TaskApi) {
         try {
             api.addTask(newTask)
         } catch (e: Exception) {
+            println("Server add failed for task id=${newTask.id}: ${e.message}")
             throw Exception("Server add failed for task id=${newTask.id}: ${e.message}", e)
         }
     }

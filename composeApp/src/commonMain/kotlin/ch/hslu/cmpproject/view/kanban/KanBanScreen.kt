@@ -51,23 +51,7 @@ fun KanbanScreen(
                 modifier = Modifier.padding(16.dp)
             )
         }
-        // Buttons für Pull / Post / Merge
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Button(onClick = { taskViewModel.pullTasks() }) {
-                Text("Pull Tasks from Server (Overwrites local)")
-            }
 
-            Button(onClick = { taskViewModel.postAllTasksForce() }) {
-                Text("Post Tasks to Server (Overwrites Server)")
-            }
-
-            Button(onClick = { taskViewModel.mergeTasks() }) {
-                Text("Merge Tasks (Adds Tasks from both sides)")
-            }
-        }
 
         Row(
             modifier = Modifier
@@ -109,6 +93,23 @@ fun KanbanScreen(
                             )
                         }
                 }
+            }
+        }
+
+        // Buttons für Pull / Post / Merge
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Button(onClick = { taskViewModel.pullTasks() }) {
+                Text("Pull Tasks from Server (Overwrites local)")
+            }
+
+            Button(onClick = { taskViewModel.postAllTasksForce() }) {
+                Text("Post Tasks to Server (Overwrites Server)")
+            }
+
+            Button(onClick = { taskViewModel.mergeTasks() }) {
+                Text("Merge Tasks (Adds Tasks from both sides)")
             }
         }
     }

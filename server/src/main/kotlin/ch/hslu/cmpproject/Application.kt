@@ -52,7 +52,7 @@ suspend fun Application.module() {
             val tasks = call.receive<List<Task>>()
 
             // 1. Alle Tasks löschen
-            queries.removeAllTasks()
+            queries.deleteAllTasks()
 
             // 2. Neue Tasks einfügen
             tasks.forEach { task ->

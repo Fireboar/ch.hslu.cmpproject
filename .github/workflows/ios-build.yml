@@ -28,26 +28,29 @@ jobs:
           ./gradlew iosArm64Binaries
           ./gradlew iosSimulatorArm64Binaries
 
-      - name: Create Xcode Project and Build IPA
+      - name: Archive iOS App
         run: |
-          # Beispiel: passe den Pfad und den Namen an dein Projekt an
           xcodebuild \
             -project iosApp/iosApp.xcodeproj \
             -scheme iosApp \
             -configuration Release \
             -sdk iphoneos \
-            -archivePath build/iosApp.xcarchive archive || true
+            -archivePath build/iosApp.xcarchive archive
 
+      - name: Export IPA
+        run: |
           mkdir -p build/ipa
-          # Exportiere ein unsigniertes IPA
           xcodebuild \
             -exportArchive \
             -archivePath build/iosApp.xcarchive \
             -exportPath build/ipa \
-            -exportOptionsPlist iosApp/exportOptions.plist || true
+            -exportOptionsPlist iosApp/exportOptions.plist
+
+      - name: Check IPA
+        run: ls -l build/ipa
 
       - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: Unsigned-iOS-App
-          path: build/ipa
+          path: build/ipa/iosApp.ipa
