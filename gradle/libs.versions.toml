@@ -1,7 +1,7 @@
 [versions]
 #Database
 coroutinesVersion = "1.10.2"
-kotlinxCoroutinesTest = "1.7.3"
+kotlinxSerializationJson = "1.9.0"
 sqlDelight = "2.1.0"
 
 #Common
@@ -20,7 +20,7 @@ composeMultiplatform = "1.9.1"
 junit = "4.13.2"
 kotlin = "2.2.20"
 kotlinx-coroutines = "1.10.2"
-ktor = "3.3.0"
+ktor = "3.3.1"
 logback = "1.5.18"
 
 #Datetime
@@ -32,10 +32,12 @@ compose = "1.7.3"
 
 [libraries]
 #Test
+jdbc-driver = { module = "app.cash.sqldelight:jdbc-driver", version.ref = "sqlDelight" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutinesVersion" }
 
 #Database
-kotlinx-coroutines-test-v173 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqlDelight" }
 sqlDelight-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqlDelight" }
 android-driver = { module = "app.cash.sqldelight:android-driver", version.ref = "sqlDelight" }
@@ -71,7 +73,6 @@ ktor-serverTestHost = { module = "io.ktor:ktor-server-test-host-jvm", version.re
 
 #Datetime
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
-
 
 
 [plugins]

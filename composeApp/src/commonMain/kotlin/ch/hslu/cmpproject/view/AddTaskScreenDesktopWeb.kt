@@ -1,0 +1,139 @@
+package ch.hslu.cmpproject.view
+
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.unit.dp
+import ch.hslu.cmpproject.viewmodel.TaskViewModel
+import kotlinx.datetime.LocalDateTime
+
+@Composable
+fun AddTaskScreenDesktopWeb(taskViewModel: TaskViewModel, paddingValues: PaddingValues) {
+    var title by remember { mutableStateOf("") }
+    var description by remember { mutableStateOf("") }
+    var date by remember { mutableStateOf("") }
+    var time by remember { mutableStateOf("") }
+    var error by remember { mutableStateOf("") }
+
+    // FocusRequester für jedes Feld
+    val titleFocus = remember { FocusRequester() }
+    val descriptionFocus = remember { FocusRequester() }
+    val dateFocus = remember { FocusRequester() }
+    val timeFocus = remember { FocusRequester() }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(paddingValues)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+
+        OutlinedTextField(
+            value = title,
+            onValueChange = { title = it },
+            label = { Text("Titel") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(titleFocus)
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown && event.key == Key.Tab) {
+                        descriptionFocus.requestFocus()
+                        true
+                    } else false
+                }
+        )
+
+        OutlinedTextField(
+            value = description,
+            onValueChange = { description = it },
+            label = { Text("Beschreibung") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(descriptionFocus)
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown && event.key == Key.Tab) {
+                        dateFocus.requestFocus()
+                        true
+                    } else false
+                }
+        )
+
+        OutlinedTextField(
+            value = date,
+            onValueChange = { date = it },
+            label = { Text("Fälligkeitsdatum (dd.mm.yyyy)") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(dateFocus)
+                .onPreviewKeyEvent { event ->
+                    if (event.type == KeyEventType.KeyDown && event.key == Key.Tab) {
+                        timeFocus.requestFocus()
+                        true
+                    } else false
+                }
+        )
+
+        OutlinedTextField(
+            value = time,
+            onValueChange = { time = it },
+            label = { Text("Uhrzeit (hh:mm)") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(timeFocus)
+        )
+
+        if (error.isNotEmpty()) {
+            Text(error, color = MaterialTheme.colorScheme.error)
+        }
+
+        Button(
+            onClick = {
+                if (title.isBlank()) {
+                    error = "Titel darf nicht leer sein"
+                    return@Button
+                }
+
+                try {
+                    val partsDate = date.split(".").map { it.toInt() }
+                    val partsTime = time.split(":").map { it.toInt() }
+
+                    LocalDateTime(
+                        year = partsDate[2],
+                        month = partsDate[1],
+                        day = partsDate[0],
+                        hour = partsTime[0],
+                        minute = partsTime[1]
+                    )
+
+                    taskViewModel.addTask(
+                        title = title,
+                        description = description,
+                        dueDate = date,
+                        dueTime = time,
+                        status = "To Do"
+                    )
+
+                    title = ""
+                    description = ""
+                    date = ""
+                    time = ""
+                    error = ""
+
+                    titleFocus.requestFocus() // Fokus zurück zum ersten Feld
+
+                } catch (e: Exception) {
+                    error = "Datum oder Uhrzeit ungültig"
+                }
+            },
+            modifier = Modifier.align(Alignment.End)
+        ) {
+            Text("Aufgabe hinzufügen")
+        }
+    }
+}

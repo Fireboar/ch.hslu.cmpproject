@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,25 +36,53 @@ fun KanbanScreen(
     val tasks by taskViewModel.tasks.collectAsState()
     val horizontalScroll = rememberScrollState()
 
+    val syncMessage by taskViewModel.syncMessage.collectAsState()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
+
+        syncMessage?.let { message ->
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+        // Buttons für Pull / Post / Merge
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Button(onClick = { taskViewModel.pullTasks() }) {
+                Text("Pull Tasks from Server (Overwrites local)")
+            }
+
+            Button(onClick = { taskViewModel.postAllTasksForce() }) {
+                Text("Post Tasks to Server (Overwrites Server)")
+            }
+
+            Button(onClick = { taskViewModel.mergeTasks() }) {
+                Text("Merge Tasks (Adds Tasks from both sides)")
+            }
+        }
+
         Row(
             modifier = Modifier
-                .weight(1f) // damit es den ganzen oberen Bereich füllt
+                .weight(1f)
                 .horizontalScroll(horizontalScroll)
-                .padding(16.dp, top = 32.dp),
+                .padding(16.dp, top = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             statuses.forEach { status ->
                 val verticalScroll = rememberScrollState()
 
                 val columnColor = when (status) {
-                    "To Do" -> Color(0xFF90CAF9) // hellblau
-                    "In Progress" -> Color(0xFFFFF9C4) // hellgelb
-                    "Done" -> Color(0xFFC8E6C9) // hellgrün
+                    "To Do" -> Color(0xFF90CAF9)
+                    "In Progress" -> Color(0xFFFFF9C4)
+                    "Done" -> Color(0xFFC8E6C9)
                     else -> MaterialTheme.colorScheme.surface
                 }
 
@@ -74,14 +103,12 @@ fun KanbanScreen(
                                 task = task,
                                 columnWidthDp = COLUMN_WIDTH_DP,
                                 onDelete = { taskViewModel.deleteTask(task) },
-                                onMove = {
-                                    targetStatus ->
+                                onMove = { targetStatus ->
                                     taskViewModel.moveTask(task, targetStatus)
                                 }
                             )
                         }
                 }
-
             }
         }
     }

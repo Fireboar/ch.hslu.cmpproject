@@ -10,7 +10,7 @@ class Database (val driver: SqlDriver){
     private val dbQuery get() = database.appDatabaseQueries
 
     internal suspend fun getAllTasks(): List<Task> {
-        return dbQuery.selectAllTasksInfo(::mapTaskSelecting).awaitAsList()
+        return dbQuery.selectAllTasks(::mapTaskSelecting).awaitAsList()
     }
 
     internal fun mapTaskSelecting(
@@ -31,11 +31,11 @@ class Database (val driver: SqlDriver){
         )
     }
 
-    internal suspend fun clearAndCreateTasks(tasks: List<Task>) {
+    internal suspend fun replaceTasks(tasks: List<Task>) {
         dbQuery.transaction {
-            dbQuery.removeAllTasks()
             tasks.forEach { task ->
-                dbQuery.insertTask(
+                dbQuery.insertOrReplaceTask(
+                    id = task.id.toLong(),
                     title = task.title,
                     description = task.description,
                     dueDate = task.dueDate,
@@ -46,7 +46,7 @@ class Database (val driver: SqlDriver){
         }
     }
 
-    internal suspend fun insertTask(task: Task) {
+    internal suspend fun insertTask(task: Task): Task {
         dbQuery.insertTask(
             title = task.title,
             description = task.description,
@@ -54,10 +54,23 @@ class Database (val driver: SqlDriver){
             dueTime = task.dueTime,
             status = task.status
         )
+        // Task aus der DB holen
+        val newId = dbQuery.lastInsertRowId().executeAsOne()
+        val inserted = dbQuery.selectTaskById(newId).executeAsOne()
+
+        // In serialisierbares Task-Modell umwandeln
+        return Task(
+            id = inserted.id.toInt(),
+            title = inserted.title,
+            description = inserted.description,
+            dueDate = inserted.dueDate,
+            dueTime = inserted.dueTime,
+            status = inserted.status
+        )
     }
 
     internal suspend fun deleteTask(task: Task) {
-        dbQuery.deleteTask(task.id.toLong())
+        dbQuery.deleteTaskById(task.id.toLong())
     }
 
     internal suspend fun updateTask(task: Task) {

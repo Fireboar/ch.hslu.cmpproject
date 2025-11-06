@@ -10,19 +10,29 @@ CREATE TABLE IF NOT EXISTS Tasks (
 );
 
 insertTask:
-INSERT INTO Tasks( title, description, dueDate, dueTime, status)
+INSERT INTO Tasks(title, description, dueDate, dueTime, status)
 VALUES( ?, ?, ?, ?, ?);
 
-removeAllTasks:
-DELETE FROM Tasks;
+insertOrReplaceTask:
+INSERT OR REPLACE INTO Tasks (id, title, description, dueDate, dueTime, status)
+VALUES (?, ?, ?, ?, ?, ?);
 
-selectAllTasksInfo:
+selectTaskById:
+SELECT * FROM Tasks WHERE id = ?;
+
+selectAllTasks:
 SELECT * FROM Tasks;
 
-deleteTask:
-DELETE FROM Tasks WHERE id = ?;
+lastInsertRowId:
+SELECT last_insert_rowid();
 
 updateTask:
 UPDATE Tasks
 SET title = ?, description = ?, dueDate = ?, dueTime = ?, status = ?
 WHERE id = ?;
+
+deleteTaskById:
+DELETE FROM Tasks WHERE id = ?;
+
+removeAllTasks:
+DELETE FROM Tasks;

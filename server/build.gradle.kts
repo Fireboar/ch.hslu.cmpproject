@@ -20,4 +20,17 @@ dependencies {
     implementation(libs.ktor.serverNetty)
     testImplementation(libs.ktor.serverTestHost)
     testImplementation(libs.kotlin.testJunit)
+
+    implementation(libs.ktor.serverCore)
+    implementation(libs.ktor.serverNetty)
+    implementation(libs.ktor.server.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
+    // SQLDelight
+    implementation(libs.runtime)
+    implementation(libs.jdbc.driver)
+    implementation(libs.sqlDelight.jvm)
+
+    // Kotlinx Serialization
+    implementation(libs.kotlinx.serialization.json)
 }

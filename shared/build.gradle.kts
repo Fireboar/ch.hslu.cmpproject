@@ -63,11 +63,6 @@ kotlin {
             implementation(libs.runtime)
             implementation(libs.kotlinx.datetime)
         }
-        /*commonTest.dependencies {
-            implementation("org.robolectric:robolectric:4.11.0")
-            implementation("androidx.test:core:1.5.0")
-            implementation("androidx.test:runner:1.5.2")
-        }*/
         androidMain.dependencies {
             //Database
             implementation(libs.ktor.client.android)
