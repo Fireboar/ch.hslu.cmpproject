@@ -7,109 +7,84 @@ import ch.hslu.cmpproject.network.TaskApi
 
 class TaskSDK(val database: Database, val api: TaskApi) {
 
+    suspend fun isServerOnline():Boolean{
+        return api.isServerOnline()
+    }
+
     suspend fun isInSync(): Boolean {
-        return try {
-            val serverTasks = api.getAllTasks()
-            val localTasks = database.getAllTasks()
-
-            // Vergleich nach ID und Inhalt
-            val serverSet = serverTasks.map { it.id to it }.toSet()
-            val localSet = localTasks.map { it.id to it }.toSet()
-
-            serverSet == localSet
-        } catch (e: Exception) {
-            false // Wenn Server nicht erreichbar, als nicht synchron betrachten
+        val serverTasks = api.getTasks()
+        if(serverTasks.isEmpty()){
+            return false
         }
+        val localTasks = database.getTasks()
+
+        val serverSet = serverTasks.map { it.id to it }.toSet()
+        val localSet = localTasks.map { it.id to it }.toSet()
+
+        return serverSet == localSet
     }
 
-    suspend fun postAllTasksForce() {
-        try {
-            // Alle lokalen Tasks auf den Server „ersetzen“ (upsert)
-            val localTasks = database.getAllTasks()
-            api.replaceTasks(localTasks)
-
-            // Optional: Lokale DB aktualisieren, falls IDs vom Server abweichen
-            val syncedTasks = api.getAllTasks()
-            database.replaceTasks(syncedTasks)
-
-        } catch (e: Exception) {
-            // Fehlerbehandlung
-            throw e
+    suspend fun postAllTasks(isServerOnline: Boolean): Boolean {
+        if (isServerOnline){
+            return api.replaceTasks(database.getTasks())
         }
+        return false
     }
 
-    suspend fun pullTasks() {
-        try {
-            // Alle Tasks vom Server holen
-            val serverTasks = api.getAllTasks()
-            // Lokale DB überschreiben
-            database.replaceTasks(serverTasks)
-        } catch (e: Exception) {
-            throw e
+    suspend fun pullTasks(isServerOnline: Boolean): Boolean {
+        if (isServerOnline){
+            val serverTasks = api.getTasks()
+            if(serverTasks.isNotEmpty()){
+                database.replaceTasks(serverTasks)
+                return true
+            } else {
+                return false
+            }
         }
+        return false
     }
 
-    suspend fun mergeTasks() {
-        try {
-            // Lokale und Server-Tasks laden
-            val serverTasks = api.getAllTasks()
-            val localTasks = database.getAllTasks()
+    suspend fun mergeTasks(isServerOnline: Boolean): Boolean {
+        if(isServerOnline){
+            val serverTasks = api.getTasks()
+            val localTasks = database.getTasks()
 
-            // Kombiniere Tasks, lokale ID als Maßstab
             val mergedTasks = (serverTasks + localTasks)
-                .distinctBy { it.id } // Duplikate vermeiden
+                .distinctBy { it.id }
 
-            // Auf Server in einem Schritt ersetzen
-            api.replaceTasks(mergedTasks)
-
-            // Danach lokale DB ersetzen, um IDs zu synchronisieren
-            val updatedServerTasks = api.getAllTasks()
+            val updatedServerTasks = api.getTasks()
             database.replaceTasks(updatedServerTasks)
 
-        } catch (e: Exception) {
-            throw e
+            return api.replaceTasks(mergedTasks)
         }
+        return false
     }
 
     suspend fun getTasks(): List<Task> {
-        return database.getAllTasks()
+        return database.getTasks()
     }
 
-    suspend fun addTask(task: Task) {
-        //Lokal einfügen
+    suspend fun addTask(task: Task, isServerOnline: Boolean): Boolean {
         val newTask = database.insertTask(task)
-
-        println("Task lokal eingefügt: id=${newTask.id}, title=${newTask.title}, description=${newTask.description}, dueDate=${newTask.dueDate}, dueTime=${newTask.dueTime}, status=${newTask.status}")
-
-        //Auf Server versuchen
-        try {
-            api.addTask(newTask)
-        } catch (e: Exception) {
-            println("Server add failed for task id=${newTask.id}: ${e.message}")
-            throw Exception("Server add failed for task id=${newTask.id}: ${e.message}", e)
+        if (isServerOnline){
+            return api.addTask(newTask)
         }
+        return false
     }
 
-    suspend fun updateTask(task: Task) {
-        // 1️⃣ Lokales Update sofort, unabhängig vom Server
+    suspend fun updateTask(task: Task, isServerOnline: Boolean): Boolean {
         database.updateTask(task)
-
-        try {
-            // 2️⃣ Versuche Server zu aktualisieren
-            api.updateTask(task) // kann Exception werfen
-        } catch (e: Exception) {
-            // 3️⃣ Fehler nur loggen oder weiterwerfen, lokales Update ist bereits erfolgt
-            throw Exception("'${e.message}'", )
+        if(isServerOnline){
+            return api.updateTask(task)
         }
+        return false
     }
 
-    suspend fun deleteTask(task: Task) {
+    suspend fun deleteTask(task: Task, isServerOnline: Boolean): Boolean {
         database.deleteTask(task)
-        try {
-            api.deleteTask(task.id.toLong()) // Server löschen
-        } catch (e: Exception) {
-            database.deleteTask(task)        // lokal trotzdem löschen
-            throw e
+        if(isServerOnline){
+            return api.deleteTask(task.id.toLong())
         }
+        return false
     }
 }

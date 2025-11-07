@@ -1,4 +1,4 @@
-package ch.hslu.cmpproject.view.kanban
+package ch.hslu.cmpproject.view.kanbanScreen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures

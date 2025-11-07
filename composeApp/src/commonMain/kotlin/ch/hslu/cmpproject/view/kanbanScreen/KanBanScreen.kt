@@ -1,4 +1,4 @@
-package ch.hslu.cmpproject.view.kanban
+package ch.hslu.cmpproject.view.kanbanScreen
 
 
 import androidx.compose.foundation.background
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -22,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import ch.hslu.cmpproject.entity.toLocalDateTimeOrNull
+import ch.hslu.cmpproject.view.ServerSync
 
 import ch.hslu.cmpproject.viewmodel.TaskViewModel
 
@@ -36,22 +38,11 @@ fun KanbanScreen(
     val tasks by taskViewModel.tasks.collectAsState()
     val horizontalScroll = rememberScrollState()
 
-    val syncMessage by taskViewModel.syncMessage.collectAsState()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(paddingValues)
     ) {
-
-        syncMessage?.let { message ->
-            Text(
-                text = message,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-
 
         Row(
             modifier = Modifier
@@ -96,21 +87,5 @@ fun KanbanScreen(
             }
         }
 
-        // Buttons für Pull / Post / Merge
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Button(onClick = { taskViewModel.pullTasks() }) {
-                Text("Pull Tasks from Server (Overwrites local)")
-            }
-
-            Button(onClick = { taskViewModel.postAllTasksForce() }) {
-                Text("Post Tasks to Server (Overwrites Server)")
-            }
-
-            Button(onClick = { taskViewModel.mergeTasks() }) {
-                Text("Merge Tasks (Adds Tasks from both sides)")
-            }
-        }
     }
 }

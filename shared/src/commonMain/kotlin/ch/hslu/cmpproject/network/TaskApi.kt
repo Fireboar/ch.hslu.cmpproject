@@ -3,6 +3,7 @@ package ch.hslu.cmpproject.network
 import ch.hslu.cmpproject.entity.Task
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -14,6 +15,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
+import kotlin.text.get
 
 class TaskApi() {
     private val httpClient = HttpClient {
@@ -23,10 +25,30 @@ class TaskApi() {
                 useAlternativeNames = false
             })
         }
+
+        install(HttpTimeout) {
+            connectTimeoutMillis = 3000   // 3 Sekunden für TCP-Verbindung
+            socketTimeoutMillis = 3000    // 3 Sekunden für Antwortdaten
+            requestTimeoutMillis = 10000  // 10 Sekunden für den gesamten Request
+        }
     }
 
-    suspend fun getAllTasks(): List<Task> {
-        return httpClient.get("http://192.168.1.22:8080/tasks").body()
+    suspend fun isServerOnline(): Boolean {
+        return try {
+            val response = httpClient.get("http://192.168.1.22:8080/health")
+            response.status == HttpStatusCode.OK
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    suspend fun getTasks(): List<Task> {
+        return try {
+            httpClient.get("http://192.168.1.22:8080/tasks").body()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            emptyList()
+        }
     }
 
     suspend fun addTask(task: Task):Boolean {
@@ -37,36 +59,44 @@ class TaskApi() {
             }
             response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK
         } catch (e: Exception) {
+            e.printStackTrace()
             false
         }
     }
 
-    suspend fun deleteTask(id: Long) {
-        httpClient.delete("http://192.168.1.22:8080/tasks/$id")
+    suspend fun deleteTask(id: Long): Boolean {
+        return try {
+            val response = httpClient.delete("http://192.168.1.22:8080/tasks/$id")
+            response.status == HttpStatusCode.OK
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
+        }
     }
 
-    suspend fun updateTask(task: Task): Task? {
+    suspend fun updateTask(task: Task) :Boolean {
         return try {
             val response = httpClient.put("http://192.168.1.22:8080/tasks/${task.id}") {
                 contentType(ContentType.Application.Json)
                 setBody(task)
             }
-
-            if (response.status == HttpStatusCode.OK) {
-                response.body<Task>() // jetzt sicher
-            } else {
-                // Optional: Loggen oder Exception werfen
-                throw Exception("Server returned ${response.status} for task ${task.id}")
-            }
+            response.status == HttpStatusCode.OK
         } catch (e: Exception) {
-            throw Exception("${e.message}")
+            e.printStackTrace()
+            false
         }
     }
 
-    suspend fun replaceTasks(tasks: List<Task>) {
-        httpClient.post("http://192.168.1.22:8080/tasks/replace") {
-            contentType(ContentType.Application.Json)
-            setBody(tasks)
+    suspend fun replaceTasks(tasks: List<Task>): Boolean {
+        return try {
+            val response = httpClient.post("http://192.168.1.22:8080/tasks/replace") {
+                contentType(ContentType.Application.Json)
+                setBody(tasks)
+            }
+            response.status == HttpStatusCode.OK
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 }

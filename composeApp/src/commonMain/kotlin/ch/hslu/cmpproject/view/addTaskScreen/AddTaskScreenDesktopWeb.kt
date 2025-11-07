@@ -1,4 +1,4 @@
-package ch.hslu.cmpproject.view
+package ch.hslu.cmpproject.view.addTaskScreen
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

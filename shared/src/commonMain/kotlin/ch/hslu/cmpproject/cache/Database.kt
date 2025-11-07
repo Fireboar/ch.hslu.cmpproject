@@ -9,7 +9,7 @@ class Database (val driver: SqlDriver){
     private val database = AppDatabase(driver)
     private val dbQuery get() = database.appDatabaseQueries
 
-    internal suspend fun getAllTasks(): List<Task> {
+    internal suspend fun getTasks(): List<Task> {
         return dbQuery.selectAllTasks(::mapTaskSelecting).awaitAsList()
     }
 

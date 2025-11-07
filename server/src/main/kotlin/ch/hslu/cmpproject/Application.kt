@@ -14,7 +14,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
 
-const val SERVER_PORT = 9090
+const val SERVER_PORT = 8080
 
 fun main() {
     embeddedServer(Netty, port = SERVER_PORT, host = "0.0.0.0", module = Application::module)
@@ -34,8 +34,6 @@ suspend fun Application.module() {
     val database = AppDatabase(driver)
     val queries = database.appDatabaseQueries
 
-
-    // --- Beispiel-Task nur einmal anlegen ---
     if (queries.selectAllTasks().executeAsList().isEmpty()) {
         queries.insertTask(
             title = "Server-Task",
@@ -48,6 +46,7 @@ suspend fun Application.module() {
 
     routing {
 
+        // REPLACE
         post("/tasks/replace") {
             val tasks = call.receive<List<Task>>()
 
@@ -68,7 +67,6 @@ suspend fun Application.module() {
 
             println("Server received task: id=${task.id}, title=${task.title}, description=${task.description}, dueDate=${task.dueDate}, dueTime=${task.dueTime}, status=${task.status}")
 
-            // Insert oder Update
             queries.insertOrReplaceTask(
                 id = task.id.toLong(),
                 title = task.title.toString(),
@@ -80,6 +78,11 @@ suspend fun Application.module() {
 
             // Nur Erfolgsstatus zurückgeben
             call.respond(HttpStatusCode.OK, mapOf("message" to "Task upserted successfully"))
+        }
+
+        // HEALTH
+        get("/health") {
+            call.respondText("OK")
         }
 
         // READ ALL
@@ -150,7 +153,6 @@ suspend fun Application.module() {
                 id = id
             )
 
-            // Aktualisierten Task abrufen
             val refreshed = queries.selectTaskById(id).executeAsOneOrNull()
             if (refreshed == null) {
                 call.respond(HttpStatusCode.InternalServerError, "Failed to retrieve task after update")
