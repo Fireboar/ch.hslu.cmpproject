@@ -14,6 +14,7 @@ import ch.hslu.cmpproject.getPlatform
 import ch.hslu.cmpproject.view.addTaskScreen.AddTaskScreen
 import ch.hslu.cmpproject.view.addTaskScreen.AddTaskScreenDesktopWeb
 import ch.hslu.cmpproject.view.bars.BottomNavigationBar
+import ch.hslu.cmpproject.view.bars.ServerSync
 import ch.hslu.cmpproject.view.bars.TopBar
 import ch.hslu.cmpproject.view.kanbanScreen.KanbanScreen
 import ch.hslu.cmpproject.view.userScreen.UserScreen

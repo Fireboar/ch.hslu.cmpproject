@@ -36,8 +36,8 @@ class TaskApi() {
     suspend fun isServerOnline(): Boolean {
         return try {
             val response = httpClient.get("http://192.168.1.22:8080/health")
-            response.status == HttpStatusCode.OK
-        } catch (e: Exception) {
+            return response.status == HttpStatusCode.OK
+        } catch (e: Throwable) {
             false
         }
     }
@@ -45,7 +45,7 @@ class TaskApi() {
     suspend fun getTasks(): List<Task> {
         return try {
             httpClient.get("http://192.168.1.22:8080/tasks").body()
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
             emptyList()
         }
@@ -57,8 +57,8 @@ class TaskApi() {
                 contentType(ContentType.Application.Json)
                 setBody(task)
             }
-            response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK
-        } catch (e: Exception) {
+            return response.status == HttpStatusCode.Created || response.status == HttpStatusCode.OK
+        } catch (e: Throwable) {
             e.printStackTrace()
             false
         }
@@ -68,7 +68,7 @@ class TaskApi() {
         return try {
             val response = httpClient.delete("http://192.168.1.22:8080/tasks/$id")
             response.status == HttpStatusCode.OK
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
             false
         }
@@ -81,7 +81,7 @@ class TaskApi() {
                 setBody(task)
             }
             response.status == HttpStatusCode.OK
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
             false
         }
@@ -94,7 +94,7 @@ class TaskApi() {
                 setBody(tasks)
             }
             response.status == HttpStatusCode.OK
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             e.printStackTrace()
             false
         }

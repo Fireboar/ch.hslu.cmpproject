@@ -3,6 +3,8 @@ package ch.hslu.cmpproject
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import ch.hslu.cmpproject.cache.AppDatabase
 import ch.hslu.cmpproject.entity.Task
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.server.application.*
@@ -13,6 +15,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.json.Json
+import io.ktor.server.plugins.cors.routing.CORS
 
 const val SERVER_PORT = 8080
 
@@ -24,6 +27,16 @@ fun main() {
 suspend fun Application.module() {
     install(ContentNegotiation) {
         json(Json { prettyPrint = true })
+    }
+
+    install(CORS) {
+        anyHost()
+        allowHeader(HttpHeaders.ContentType)
+        allowMethod(HttpMethod.Get)
+        allowMethod(HttpMethod.Post)
+        allowMethod(HttpMethod.Put)
+        allowMethod(HttpMethod.Delete)
+        allowMethod(HttpMethod.Options)
     }
 
     // ✅ SQLDelight initialisieren

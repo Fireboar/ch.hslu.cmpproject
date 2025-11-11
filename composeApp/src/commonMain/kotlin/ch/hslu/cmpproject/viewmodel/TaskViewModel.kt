@@ -30,7 +30,6 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
 
     init {
         checkServerStatus()
-        isInSync()
         loadTasks()
     }
 
@@ -41,6 +40,16 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
         clearMessageJob = viewModelScope.launch {
             delay(8000)
             _syncMessage.value = SyncMessage("", isPositive = false)
+        }
+    }
+
+    fun checkServerStatus(){
+        viewModelScope.launch {
+            while (true) {
+                isInSync()
+                isServerOnline()
+                delay(5000)
+            }
         }
     }
 
@@ -55,22 +64,17 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
         }
     }
 
-    fun checkServerStatus() {
+    fun isServerOnline() {
         viewModelScope.launch {
-            while (true) {
-                _isServerOnline.value = sdk.isServerOnline()
-                delay(5000)
-            }
+            _isServerOnline.value = sdk.isServerOnline()
         }
     }
 
     private fun loadTasks() {
         viewModelScope.launch {
             _isLoading.value = true
-
             val loadedTasks = sdk.getTasks()
             _tasks.value = loadedTasks.toList()
-
             _isLoading.value = false
         }
     }

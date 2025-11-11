@@ -1,4 +1,4 @@
-package ch.hslu.cmpproject.view
+package ch.hslu.cmpproject.view.bars
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,6 +25,7 @@ import ch.hslu.cmpproject.viewmodel.TaskViewModel
 fun ServerSync (taskViewModel: TaskViewModel) {
     val syncMessage by taskViewModel.syncMessage.collectAsState()
     val serverOnline by taskViewModel.isServerOnline.collectAsState()
+    val isLoading by taskViewModel.isLoading.collectAsState()
 
 
     Row(
@@ -49,6 +52,17 @@ fun ServerSync (taskViewModel: TaskViewModel) {
                 )
             }
         } else {
+            if (isLoading) {
+                // Show a loading icon
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(start = 8.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             Spacer(modifier = Modifier.weight(1f))
         }
 

@@ -1,6 +1,8 @@
 package ch.hslu.cmpproject.cache
 
 import app.cash.sqldelight.async.coroutines.awaitAsList
+import app.cash.sqldelight.async.coroutines.awaitAsOne
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
 import app.cash.sqldelight.db.SqlDriver
 import ch.hslu.cmpproject.entity.Task
 
@@ -59,10 +61,10 @@ class Database (val driver: SqlDriver){
             )
 
             // ID direkt nach Insert abrufen
-            val newId = dbQuery.lastInsertRowId().executeAsOne()
+            val newId = dbQuery.lastInsertRowId().awaitAsOne()
 
             // Task anhand der ID holen
-            val inserted = dbQuery.selectTaskById(newId).executeAsOneOrNull()
+            val inserted = dbQuery.selectTaskById(newId).awaitAsOneOrNull()
                 ?: throw IllegalStateException("Task wurde nicht gefunden, ID=$newId")
 
             // serialisierbares Task zurückgeben

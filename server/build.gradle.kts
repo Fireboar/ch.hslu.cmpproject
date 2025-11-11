@@ -33,4 +33,5 @@ dependencies {
 
     // Kotlinx Serialization
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.ktor.server.cors)
 }
