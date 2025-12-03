@@ -25,7 +25,6 @@ import ch.hslu.cmpproject.viewmodel.TaskViewModel
 fun ServerSync (taskViewModel: TaskViewModel) {
     val syncMessage by taskViewModel.syncMessage.collectAsState()
     val serverOnline by taskViewModel.isServerOnline.collectAsState()
-    val isLoading by taskViewModel.isLoading.collectAsState()
 
 
     Row(
@@ -52,17 +51,6 @@ fun ServerSync (taskViewModel: TaskViewModel) {
                 )
             }
         } else {
-            if (isLoading) {
-                // Show a loading icon
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .padding(start = 8.dp),
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Spacer(modifier = Modifier.weight(1f))
-            }
             Spacer(modifier = Modifier.weight(1f))
         }
 

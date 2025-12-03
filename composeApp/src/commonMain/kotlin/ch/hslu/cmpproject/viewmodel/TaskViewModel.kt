@@ -15,9 +15,6 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
     private val _tasks = MutableStateFlow<List<Task>>(emptyList())
     val tasks: StateFlow<List<Task>> = _tasks
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> = _isLoading
-
     private val _syncMessage = MutableStateFlow(
         SyncMessage("", isPositive = false)
     )
@@ -72,16 +69,14 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
 
     private fun loadTasks() {
         viewModelScope.launch {
-            _isLoading.value = true
             val loadedTasks = sdk.getTasks()
             _tasks.value = loadedTasks.toList()
-            _isLoading.value = false
+            
         }
     }
 
     fun postTasks() {
         viewModelScope.launch {
-            _isLoading.value = true
             val success = sdk.postAllTasks(isServerOnline.value)
             if(success){
                 setSyncMessage("Tasks wurden auf den Server gepostet.", true)
@@ -89,13 +84,12 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
                 setSyncMessage("Fehler beim Posten der Tasks.", false)
             }
             loadTasks()
-            _isLoading.value = false
+            
         }
     }
 
     fun pullTasks() {
         viewModelScope.launch {
-            _isLoading.value = true
             val success = sdk.pullTasks(isServerOnline.value)
             if(success){
                 setSyncMessage("Tasks vom Server geladen und lokal synchronisiert.", true)
@@ -103,13 +97,12 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
                 setSyncMessage("Fehler beim Laden der Tasks.", false)
             }
             loadTasks()
-            _isLoading.value = false
+            
         }
     }
 
     fun mergeTasks() {
         viewModelScope.launch {
-            _isLoading.value = true
             val success = sdk.mergeTasks(isServerOnline.value)
             if(success){
                 setSyncMessage("Server- und lokale Tasks wurden zusammengeführt.", true)
@@ -117,7 +110,7 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
                 setSyncMessage("Fehler beim Mergen der Tasks.", false)
             }
             loadTasks()
-            _isLoading.value = false
+            
         }
     }
 
@@ -137,7 +130,6 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
 
     fun addTask(task: Task) {
         viewModelScope.launch {
-            _isLoading.value = true
             val success = sdk.addTask(task, isServerOnline.value)
             if (success) {
                 setSyncMessage("'${task.title}' erfolgreich hinzugefügt und synchronisiert.", true)
@@ -145,14 +137,12 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
                 setSyncMessage("'${task.title}' konnte nicht auf den Server hochgeladen werden.", false)
             }
             loadTasks()
-            _isLoading.value = false
+            
         }
     }
 
     fun deleteTask(task: Task) {
         viewModelScope.launch {
-            _isLoading.value = true
-
             val success = sdk.deleteTask(task, isServerOnline.value)
             if(success){
                 setSyncMessage("'${task.title}' erfolgreich gelöscht und synchronisiert.", true)
@@ -161,14 +151,24 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
             }
 
             loadTasks()
-            _isLoading.value = false
+        }
+    }
+
+    fun updateTask(task: Task){
+        viewModelScope.launch {
+            val success = sdk.updateTask(task,isServerOnline.value)
+            if(success) {
+                setSyncMessage("'${task.title}' erfolgreich aktualisiert.", true)
+            } else {
+                setSyncMessage("'${task.title}' konnte nicht synchronisiert werden.", false)
+            }
+
+            loadTasks()
         }
     }
 
     fun moveTask(task: Task, newStatus: String) {
         viewModelScope.launch {
-            _isLoading.value = true
-
             val updatedTask = task.copy(status = newStatus)
             val success = sdk.updateTask(updatedTask,isServerOnline.value)
             if(success) {
@@ -178,7 +178,6 @@ class TaskViewModel (private val sdk: TaskSDK) : ViewModel(){
             }
 
             loadTasks()
-            _isLoading.value = false
         }
     }
 

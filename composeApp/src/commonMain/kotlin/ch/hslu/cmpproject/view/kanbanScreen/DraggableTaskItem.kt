@@ -1,6 +1,7 @@
 package ch.hslu.cmpproject.view.kanbanScreen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,7 +36,8 @@ fun DraggableTaskItem(
     task: Task,
     columnWidthDp: Dp,
     onDelete: () -> Unit,
-    onMove: (targetStatus: String) -> Unit
+    onMove: (targetStatus: String) -> Unit,
+    onClick: () -> Unit
 ) {
     var offset by remember { mutableStateOf(Offset.Zero) }
 
@@ -43,6 +45,10 @@ fun DraggableTaskItem(
         modifier = Modifier
             .fillMaxWidth()
             .offset { IntOffset(offset.x.roundToInt(), offset.y.roundToInt()) }
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = null
+            )
             .pointerInput(task.id) {
                 detectDragGestures(
                     onDrag = { _, dragAmount ->

@@ -20,6 +20,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import ch.hslu.cmpproject.entity.Task
 import ch.hslu.cmpproject.entity.toLocalDateTimeOrNull
 
 import ch.hslu.cmpproject.viewmodel.TaskViewModel
@@ -30,7 +31,8 @@ public val COLUMN_WIDTH_DP = 300.dp
 @Composable
 fun KanbanScreen(
     taskViewModel: TaskViewModel,
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
+    onTaskClick: (Task) -> Unit
 ) {
     val tasks by taskViewModel.tasks.collectAsState()
     val horizontalScroll = rememberScrollState()
@@ -77,7 +79,8 @@ fun KanbanScreen(
                                 onDelete = { taskViewModel.deleteTask(task) },
                                 onMove = { targetStatus ->
                                     taskViewModel.moveTask(task, targetStatus)
-                                }
+                                },
+                                onClick = { onTaskClick(task) }
                             )
                         }
                 }

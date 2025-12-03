@@ -17,12 +17,13 @@ import ch.hslu.cmpproject.view.bars.BottomNavigationBar
 import ch.hslu.cmpproject.view.bars.ServerSync
 import ch.hslu.cmpproject.view.bars.TopBar
 import ch.hslu.cmpproject.view.kanbanScreen.KanbanScreen
+import ch.hslu.cmpproject.view.taskDetailScreen.TaskDetailScreen
 import ch.hslu.cmpproject.view.userScreen.UserScreen
 import ch.hslu.cmpproject.viewmodel.TaskViewModel
 
 
 // Screens definieren
-enum class ScreenType { KANBAN, ADDTASK, USER}
+enum class ScreenType { KANBAN, ADDTASK,  TASKDETAIL, USER}
 
 @Composable
 fun Navigation(taskViewModel: TaskViewModel) {
@@ -30,9 +31,11 @@ fun Navigation(taskViewModel: TaskViewModel) {
         mutableStateOf(ScreenType.KANBAN)
     }
 
+    var currentTaskId by rememberSaveable { mutableStateOf<Int?>(null) }
 
     fun navigateTo(screen: ScreenType, taskId: Int? = null) {
         currentScreen = screen
+        currentTaskId = taskId
     }
 
 
@@ -58,7 +61,10 @@ fun Navigation(taskViewModel: TaskViewModel) {
         //Content
         when (currentScreen) {
 
-            ScreenType.KANBAN -> KanbanScreen(taskViewModel, paddingValues)
+            ScreenType.KANBAN -> KanbanScreen(
+                taskViewModel, paddingValues,
+                onTaskClick = { task -> navigateTo(ScreenType.TASKDETAIL, task.id) }
+            )
 
             ScreenType.ADDTASK -> {
                 when (getPlatform()) {
@@ -68,6 +74,15 @@ fun Navigation(taskViewModel: TaskViewModel) {
                     )
                     else -> AddTaskScreen(taskViewModel, paddingValues)
                 }
+            }
+
+            ScreenType.TASKDETAIL -> currentTaskId?.let { taskId ->
+                TaskDetailScreen(
+                    taskId = taskId,
+                    taskViewModel = taskViewModel,
+                    outerPadding = paddingValues,
+                    onNavigateBack = { navigateTo(ScreenType.KANBAN) }
+                )
             }
 
             ScreenType.USER -> UserScreen(taskViewModel,paddingValues)
